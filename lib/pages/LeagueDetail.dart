@@ -6,6 +6,11 @@ import '../models/Team.dart';
 import 'AddQuiniela.dart';
 
 class LeagueDetail extends StatefulWidget {
+
+  final int id;
+
+  LeagueDetail(this.id);
+
   @override
   _LeagueDetailState createState() => _LeagueDetailState();
 }
@@ -14,6 +19,7 @@ class _LeagueDetailState extends State<LeagueDetail> {
 
   List<Team> _teams = List<Team>();
   String name = '';
+  int currentJourney = 0;
 
   @override
   void initState() { 
@@ -22,13 +28,14 @@ class _LeagueDetailState extends State<LeagueDetail> {
   }
 
   Future<Null> _getTeams() async {
-    var response = await http.get('http://quinielas.memoadian.com/api/leagues/1');
+    var response = await http.get('http://quinielas.memoadian.com/api/leagues/${this.widget.id}');
 
     if (response.statusCode == 200) {
       var result = json.decode(response.body);
 
       Iterable list = result[0]['teams'];
       setState(() {
+        currentJourney = result[0]['current_journey'];
         name = result[0]['name'];
         _teams = list.map((model) => Team.fromJson(model)).toList();
       });
@@ -48,7 +55,7 @@ class _LeagueDetailState extends State<LeagueDetail> {
         onPressed: () => (
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddQuiniela()),
+            MaterialPageRoute(builder: (context) => AddQuiniela(currentJourney)),
           )
         ),
         child: Icon(Icons.add),
